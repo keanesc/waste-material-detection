@@ -22,7 +22,7 @@ def train_waste_detector(data_yaml, epochs=50, imgsz=640, batch=16, device="cpu"
 
     print("Training YOLOv8 for Waste Detection")
     print("Loading YOLOv8n pretrained model...")
-    model = YOLO("models/yolov8n.pt")
+    model = YOLO("models/yolov8s.pt")
 
     print(f"\nStarting training for {epochs} epochs...")
     print(f"Dataset: {data_yaml}")
@@ -120,7 +120,7 @@ def main():
 
     model, results = train_waste_detector(
         data_yaml=data_yaml,
-        epochs=50,
+        epochs=30,
         imgsz=640,
         batch=16,
         device="cpu",  # Change to "cuda" if GPU available
