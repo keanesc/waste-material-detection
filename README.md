@@ -1,6 +1,6 @@
 # Waste Detection with YOLOv8
 
-Finetune YOLOv8 object detection model to identify and count waste types (general, plastic, paper, metal) in images for smart recycling and automated sorting systems.
+YOLOv8 object detection model for identifying waste types: general, plastic, paper, and metal.
 
 ## Dataset
 
@@ -10,99 +10,43 @@ This project uses the [TACO dataset](http://tacodataset.org/) which contains 1,5
 
 The original 60 categories are mapped to 4 main waste types:
 
-- **General**: Non-recyclable waste
-- **Plastic**: Bottles, containers, bags, wrappers, etc.
-- **Paper**: Cardboard, cartons, paper bags, etc.
-- **Metal**: Cans, foil, bottle caps, etc.
+- General: Non-recyclable waste
+- Plastic: Bottles, containers, bags, wrappers
+- Paper: Cardboard, cartons, paper bags
+- Metal: Cans, foil, bottle caps
 
 ## Quick Start
 
-### 1. Prepare the Dataset
-
-Convert TACO annotations from COCO format to YOLO format:
+### 1. Prepare Dataset
 
 ```bash
 pixi run prepare
 ```
 
-This script:
+Converts COCO annotations to YOLO format and simplifies categories.
 
-- Simplifies 60 categories → 4 waste types
-- Converts COCO format → YOLO format
-- Creates dataset configuration YAML
-- **Idempotent**: Safe to run multiple times (skips if already done)
-
-### 2. Train the Model
-
-Train YOLOv8 on the waste detection dataset:
+### 2. Train Model
 
 ```bash
 pixi run train
 ```
 
-Training parameters:
+Trains YOLOv8n for 50 epochs (640x640 images, batch size 16).
 
-- Model: YOLOv8n (nano - fastest)
-- Epochs: 50
-- Image size: 640x640
-- Batch size: 16
-- Device: CPU (change to "cuda" for GPU)
-
-**Idempotent**: If a trained model exists, it will load it instead of retraining.
-
-### 3. Use the Trained Model
+### 3. Use Model
 
 ```python
 from ultralytics import YOLO
 
-# Load trained model
 model = YOLO('runs/detect/waste_detector/weights/best.pt')
-
-# Predict on images
 results = model.predict('image.jpg', conf=0.25)
-
-# Count waste types
-for result in results:
-    boxes = result.boxes
-    for box in boxes:
-        cls_id = int(box.cls[0])
-        cls_name = model.names[cls_id]
-        confidence = float(box.conf[0])
-        print(f"{cls_name}: {confidence:.2f}")
 ```
 
-## Project Structure
-
-```
-recyclable-material-detection/
-├── prepare_dataset.py               # Dataset preparation script
-├── train_waste_detector.py          # Training script
-├── TACO/                            # TACO dataset
-│   └── data/
-│       ├── annotations.json         # Original annotations
-│       └── batch_*/                 # Image batches
-└── data/
-    ├── annotations_simplified.json  # Simplified annotations
-    └── yolo_dataset/                # YOLO format dataset
-        ├── images/                  # Images
-        ├── labels/                  # YOLO labels
-        └── waste.yaml               # Dataset config
-```
-
-## Requirements
-
-Install dependencies using pixi:
+## Installation
 
 ```bash
 pixi install
 ```
-
-## Key Features
-
-✅ **Simple**: Minimal code, easy to understand  
-✅ **Idempotent**: Safe to run scripts multiple times  
-✅ **Automated**: End-to-end pipeline from dataset to trained model  
-✅ **Practical**: Real-world waste categories for recycling systems
 
 ## Use Cases
 
@@ -115,10 +59,10 @@ pixi install
 
 The model is evaluated on:
 
-- **Precision**: How many detections are correct
-- **Recall**: How many objects are detected
-- **mAP50**: Mean Average Precision at 50% IoU
-- **mAP50-95**: Mean Average Precision at 50-95% IoU
+- Precision: How many detections are correct
+- Recall: How many objects are detected
+- mAP50: Mean Average Precision at 50% IoU
+- mAP50-95: Mean Average Precision at 50-95% IoU
 
 Metrics are displayed after training and saved to `runs/detect/waste_detector/`.
 

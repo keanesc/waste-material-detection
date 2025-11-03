@@ -20,7 +20,7 @@ def load_model(model_path=None):
     return model
 
 
-def detect_waste(model, image_path, conf=0.25, save=True):
+def detect_waste(model, image_path, conf=0.35, iou=0.45, save=True):
     image_path = Path(image_path)
 
     if not image_path.exists():
@@ -33,6 +33,7 @@ def detect_waste(model, image_path, conf=0.25, save=True):
     results = model.predict(
         source=str(image_path),
         conf=conf,
+        iou=iou,
         save=save,
         project="runs/detect",
         name="inference",
@@ -83,7 +84,7 @@ def main():
         print(f"No image specified, using: {image_path}")
         print("Usage: python waste_detector.py <image_path>")
 
-    summary = detect_waste(model, image_path, conf=0.25, save=True)
+    summary = detect_waste(model, image_path, conf=0.35, save=True)
 
     if summary:
         print("\nEnd")

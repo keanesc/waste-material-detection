@@ -24,8 +24,8 @@ torchvision = { version = ">=0.24.0", index = "https://download.pytorch.org/whl/
 system-requirements = { cuda = "12.9" }
 
 [feature.gpu.pypi-dependencies]
-torch = { version = ">=2.9.0", index = "https://download.pytorch.org/whl/cu128" }
-torchvision = { version = ">=0.24.0", index = "https://download.pytorch.org/whl/cu128" }
+torch = { version = ">=2.9.0", index = "https://download.pytorch.org/whl/cu130" }
+torchvision = { version = ">=0.24.0", index = "https://download.pytorch.org/whl/cu130" }
 
 [environments]
 gpu = { features = ["gpu"] }

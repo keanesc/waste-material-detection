@@ -1,6 +1,5 @@
 """
-Converts COCO format to YOLO format and creates simplified class mappings.
-Includes dataset splitting and duplicate removal.
+Converts COCO format to YOLO format with simplified class mappings.
 """
 
 import json
@@ -95,16 +94,12 @@ def simplify_annotations(input_json, output_json):
     return output_json
 
 
-def convert_to_yolo(annotations_json, taco_dir, output_dir):
-    """
-    Manually converts annotations and symlinks images.
-    """
-
+def convert_to_yolo(annotations_json, taco_dir, output_dir, force=False):
     output_path = Path(output_dir)
     labels_dir = output_path / "labels"
     images_dir = output_path / "images"
 
-    if (
+    if not force and (
         labels_dir.exists()
         and any(labels_dir.glob("*.txt"))
         and images_dir.exists()
@@ -114,6 +109,7 @@ def convert_to_yolo(annotations_json, taco_dir, output_dir):
         image_count = len(list(images_dir.glob("*.*")))
         print(f"YOLO format data already exists at {output_dir}")
         print(f"Found {label_count} label files and {image_count} images")
+        print("Set force=True to reconvert")
         return output_dir
 
     print("Converting COCO format to YOLO format...")
@@ -138,7 +134,10 @@ def convert_to_yolo(annotations_json, taco_dir, output_dir):
         img_height = img_info["height"]
         img_filename = Path(img_info["file_name"])
 
-        label_filename = img_filename.stem + ".txt"
+        # Create unique filename using format: batchX_filename
+        # This prevents different images from different batches from overwriting each other
+        unique_name = img_filename.parent.name + "_" + img_filename.name
+        label_filename = Path(unique_name).stem + ".txt"
         label_path = labels_dir / label_filename
 
         image_annotations = annotations_by_image.get(img_id, [])
@@ -165,7 +164,7 @@ def convert_to_yolo(annotations_json, taco_dir, output_dir):
             converted_images += 1
 
             src_image_path = taco_dir / img_info["file_name"]
-            dst_image_path = images_dir / img_filename.name
+            dst_image_path = images_dir / unique_name
 
             if src_image_path.exists() and not dst_image_path.exists():
                 dst_image_path.symlink_to(src_image_path)
@@ -222,15 +221,23 @@ def remove_duplicate_images(output_dir):
 
 
 def split_dataset(
-    output_dir, train_ratio=0.7, val_ratio=0.2, test_ratio=0.1, seed=42
+    output_dir, train_ratio=0.7, val_ratio=0.2, test_ratio=0.1, seed=42, force=False
 ):
     output_path = Path(output_dir)
     images_dir = output_path / "images"
     labels_dir = output_path / "labels"
 
-    if (images_dir / "train").exists() and (images_dir / "val").exists():
-        print("Dataset already split into train/val/test")
-        return
+    if (
+        not force
+        and (images_dir / "train").exists()
+        and (images_dir / "val").exists()
+    ):
+        # Check if there are files in the split directories
+        train_count = len(list((images_dir / "train").glob("*")))
+        if train_count > 0:
+            print("Dataset already split into train/val/test")
+            print("Use --force to re-split the dataset")
+            return
 
     print("Splitting dataset into train/val/test...")
 
@@ -266,18 +273,15 @@ def split_dataset(
     print(f"Val: {len(val_files)} images")
     print(f"Test: {len(test_files)} images")
 
-    # Function to move files
     def move_files(file_list, split_name):
         moved_images = 0
         moved_labels = 0
 
         for img_path in file_list:
-            # Move image
             dest_img = images_dir / split_name / img_path.name
             shutil.move(str(img_path), str(dest_img))
             moved_images += 1
 
-            # Move corresponding label
             label_name = img_path.stem + ".txt"
             label_path = labels_dir / label_name
 
@@ -288,12 +292,11 @@ def split_dataset(
 
         return moved_images, moved_labels
 
-    # Move files to respective directories
     move_files(train_files, "train")
     move_files(val_files, "val")
     move_files(test_files, "test")
 
-    print("✓ Dataset split complete!")
+    print("Dataset split complete!")
 
 
 def regenerate_missing_labels(output_dir, annotations_json):
@@ -397,7 +400,12 @@ names:
     return yaml_path
 
 
-def main():
+def main(force=False):
+    import sys
+
+    if "--force" in sys.argv:
+        force = True
+
     project_root = Path(__file__).parent
     taco_dir = project_root / "TACO" / "data"
     original_annotations = taco_dir / "annotations.json"
@@ -405,18 +413,22 @@ def main():
     yolo_output_dir = project_root / "data" / "yolo_dataset"
 
     print("TACO Dataset Preparation for YOLOv8")
+    if force:
+        print("FORCE MODE: Will reconvert all data\n")
 
     print("\n[1/6] Simplifying annotations...")
     simplify_annotations(original_annotations, simplified_annotations)
 
     print("\n[2/6] Converting to YOLO format...")
-    convert_to_yolo(simplified_annotations, taco_dir, yolo_output_dir)
+    convert_to_yolo(simplified_annotations, taco_dir, yolo_output_dir, force=force)
 
     print("\n[3/6] Removing duplicate images...")
     remove_duplicate_images(yolo_output_dir)
 
     print("\n[4/6] Splitting dataset...")
-    split_dataset(yolo_output_dir, train_ratio=0.7, val_ratio=0.2, test_ratio=0.1)
+    split_dataset(
+        yolo_output_dir, train_ratio=0.7, val_ratio=0.2, test_ratio=0.1, force=force
+    )
 
     print("\n[5/6] Checking for missing labels...")
     regenerate_missing_labels(yolo_output_dir, simplified_annotations)
@@ -446,7 +458,9 @@ def main():
     print("\nDataset preparation complete")
     print(f"Dataset location: {yolo_output_dir}")
     print(f"Config file: {yaml_path}")
-    print("\nNext: Run 'python train_waste_detector.py' to start training")
+    print(
+        "\nNext: Run 'pixi run train' or 'pixi run python train_waste_detector.py' to start training"
+    )
 
     return yaml_path
 
