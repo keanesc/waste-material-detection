@@ -7,8 +7,11 @@ version = "0.1.0"
 
 [tasks]
 clone = { cmd = "git clone https://github.com/pedropro/TACO.git" }
-download = { cmd = "python download.py" }
-prepare = { cmd = "python prepare_dataset.py" }
+download = { cmd = "python download.py", cwd = "TACO" }
+prepare = { cmd = "python prepare_dataset.py", depends-on = [
+    "clone",
+    "download",
+] }
 train = { cmd = "python train_waste_detector.py" }
 inference = { cmd = "python waste_detector.py path/to/image.jpg" }
 all = { depends-on = ["prepare", "train", "inference"] }
