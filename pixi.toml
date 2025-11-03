@@ -1,0 +1,20 @@
+[workspace]
+authors = ["keanesc <145848994+keanesc@users.noreply.github.com>"]
+channels = ["conda-forge"]
+name = "recyclable-material-detection"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+clone = { cmd = "git clone https://github.com/pedropro/TACO.git" }
+download = { cmd = "python download.py" }
+prepare = { cmd = "python prepare_dataset.py" }
+train = { cmd = "python train_waste_detector.py" }
+inference = { cmd = "python waste_detector.py path/to/image.jpg" }
+all = { depends-on = ["prepare", "train", "inference"] }
+
+[dependencies]
+python = ">=3.12.0,<3.14"
+
+[pypi-dependencies]
+ultralytics = ">=8.3.223, <9"
