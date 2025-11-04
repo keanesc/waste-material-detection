@@ -53,6 +53,7 @@ def train_waste_detector(
         name="waste_detector",
         exist_ok=True,
         verbose=True,
+        workers=0,  # Disable multiprocessing to avoid crashes
     )
 
     print("Training complete")
@@ -157,7 +158,7 @@ def main():
         data_yaml=data_yaml,
         epochs=100,
         imgsz=640,
-        batch=16,
+        batch=4,  # Reduced for CPU training stability
         device="cpu",
         model_size="n",
         resume=False,
