@@ -14,14 +14,14 @@ inference = { cmd = "python waste_detector.py path/to/image.jpg" }
 all = { depends-on = ["prepare", "train", "inference"] }
 
 [dependencies]
-python = ">=3.12.0,<3.14"
+python = ">=3.12.0,<3.13"
 
 [feature.cpu.pypi-dependencies]
 torch = { version = ">=2.9.0", index = "https://download.pytorch.org/whl/cpu" }
 torchvision = { version = ">=0.24.0", index = "https://download.pytorch.org/whl/cpu" }
 
 [feature.gpu]
-system-requirements = { cuda = "12.9" }
+system-requirements = { cuda = "13.0" }
 
 [feature.gpu.pypi-dependencies]
 torch = { version = ">=2.9.0", index = "https://download.pytorch.org/whl/cu130" }

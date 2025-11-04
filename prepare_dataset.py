@@ -164,7 +164,9 @@ def convert_to_yolo(annotations_json, taco_dir, output_dir, force=False):
             converted_images += 1
 
             src_image_path = taco_dir / img_info["file_name"]
-            dst_image_path = images_dir / unique_name
+            # Normalize extension to lowercase .jpg to avoid case sensitivity issues
+            unique_name_normalized = Path(unique_name).stem + ".jpg"
+            dst_image_path = images_dir / unique_name_normalized
 
             if src_image_path.exists() and not dst_image_path.exists():
                 dst_image_path.symlink_to(src_image_path)

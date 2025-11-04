@@ -9,7 +9,7 @@ def train_waste_detector(
     imgsz=640,
     batch=16,
     device="cpu",
-    model_size="m",  # n, s, m, l, x
+    model_size="n",  # n, s, m, l, x
     resume=False,
 ):
     project_dir = Path("runs/detect")
@@ -53,41 +53,6 @@ def train_waste_detector(
         name="waste_detector",
         exist_ok=True,
         verbose=True,
-        optimizer="AdamW",
-        lr0=0.001,
-        lrf=0.01,
-        momentum=0.937,
-        weight_decay=0.0005,
-        warmup_epochs=3.0,
-        warmup_momentum=0.8,
-        warmup_bias_lr=0.1,
-        # Data augmentation
-        hsv_h=0.015,  # HSV-Hue augmentation (0.0-1.0)
-        hsv_s=0.7,  # HSV-Saturation augmentation (0.0-1.0)
-        hsv_v=0.4,  # HSV-Value augmentation (0.0-1.0)
-        degrees=10.0,  # Image rotation (+/- deg)
-        translate=0.1,  # Image translation (+/- fraction)
-        scale=0.5,  # Image scale (+/- gain)
-        shear=2.0,  # Image shear (+/- deg)
-        perspective=0.0,  # Image perspective (+/- fraction)
-        flipud=0.0,  # Vertical flip probability
-        fliplr=0.5,  # Horizontal flip probability
-        mosaic=1.0,  # Mosaic augmentation probability
-        mixup=0.15,  # MixUp augmentation probability
-        copy_paste=0.1,  # Copy-paste augmentation probability
-        # Advanced training settings
-        cos_lr=True,  # Use cosine learning rate scheduler
-        close_mosaic=10,  # Disable mosaic in last N epochs for better final accuracy
-        patience=50,  # Early stopping patience (epochs without improvement)
-        # Loss function weights (tune if class imbalance)
-        box=7.5,  # Box loss gain
-        cls=0.5,  # Class loss gain (reduce if many classes)
-        dfl=1.5,  # DFL loss gain
-        # Validation settings
-        val=True,
-        save=True,
-        save_period=-1,  # Save checkpoint every N epochs (-1 to disable)
-        plots=True,  # Generate training plots
     )
 
     print("Training complete")
@@ -194,7 +159,7 @@ def main():
         imgsz=640,
         batch=16,
         device="cpu",
-        model_size="m",
+        model_size="n",
         resume=False,
     )
 
