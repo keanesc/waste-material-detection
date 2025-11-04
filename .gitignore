@@ -4,7 +4,10 @@
 
 TACO
 docs/
+log/
 models
+generate_report.py
+results.zip
 
 # Python
 __pycache__/
