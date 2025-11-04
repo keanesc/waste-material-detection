@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import torch
 from ultralytics import YOLO  # type: ignore
 
 
@@ -154,13 +155,25 @@ def main():
         print("\nRun 'python prepare_dataset.py' first")
         return
 
+    # Auto-detect CUDA availability
+    if torch.cuda.is_available():
+        device = "cuda"
+        model_size = "s"
+        batch = 16
+        print(f"CUDA detected - using GPU with YOLOv8{model_size}")
+    else:
+        device = "cpu"
+        model_size = "n"
+        batch = 4
+        print(f"No CUDA - using CPU with YOLOv8{model_size}")
+
     model, results = train_waste_detector(
         data_yaml=data_yaml,
         epochs=100,
         imgsz=640,
-        batch=4,  # Reduced for CPU training stability
-        device="cpu",
-        model_size="n",
+        batch=batch,
+        device=device,
+        model_size=model_size,
         resume=False,
     )
 

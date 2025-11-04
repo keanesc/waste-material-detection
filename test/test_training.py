@@ -31,11 +31,11 @@ try:
         verbose=True,
         workers=0,  # Disable multiprocessing
     )
-    print("\n✅ SUCCESS: Training completed first epoch without crashing!")
+    print("\nSUCCESS: Training completed first epoch without crashing!")
     print("The issue may be batch size or workers related.")
 
 except Exception as e:
-    print(f"\n❌ CRASH DETECTED: {type(e).__name__}")
+    print(f"\nCRASH DETECTED: {type(e).__name__}")
     print(f"Error message: {e}")
     import traceback
 
