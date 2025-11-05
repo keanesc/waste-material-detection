@@ -109,7 +109,7 @@ results[0].show()
 
 ## Documentation
 
-See `report/technical_report.md` for detailed methodology, results, and analysis.
+See [Technical Report](report/technical_report.md) for detailed methodology, results, and analysis.
 
 ## License
 
